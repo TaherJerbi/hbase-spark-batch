@@ -12,7 +12,7 @@ import scala.Tuple2;
 
 public class BatchSentiment {
 
-    public void createHbaseTable() {
+    public void countSentiments() {
         Configuration config = HBaseConfiguration.create();
         SparkConf sparkConf = new SparkConf().setAppName("SparkHBaseTest").setMaster("local[4]");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
@@ -32,19 +32,21 @@ public class BatchSentiment {
                 tuple -> {
                     String text = new String(tuple._2.getValue("cf".getBytes(), "comment_body".getBytes()));
                     System.out.println("Text: "+text);
-                    String sentiment = analyzer.addSentiment(text);
+                    String sentiment = analyzer.getMajoritySentiment(text);
                     return new Tuple2<String, Integer>(sentiment, 1);
                 }
         ).reduceByKey(
                 (x, y) -> x + y
         );
 
-        System.out.println("Sentiment counts: "+sentimentCounts.collect());
+        // save the results to HBase
+        HbaseRepository hbaseRepository = HbaseRepository.getInstance();
+        hbaseRepository.insertResult(sentimentCounts.collect());
     }
 
     public static void main(String[] args){
         BatchSentiment admin = new BatchSentiment();
-        admin.createHbaseTable();
+        admin.countSentiments();
     }
 
 }

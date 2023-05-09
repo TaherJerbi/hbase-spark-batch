@@ -28,7 +28,7 @@ public class SentimentAnalyzer implements Serializable {
     // add sentiment to each line
     // IN: comment_id, comment_parent_id, comment_body, subreddit, timestamp
     // OUT: comment_id, comment_parent_id, comment_body, subreddit, timestamp, sentiment
-    public String addSentiment(String text){
+    public String getMajoritySentiment(String text){
         // create a pipeline inside the function to avoid the error: java.io.NotSerializableException: edu.stanford.nlp.pipeline.StanfordCoreNLP
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
