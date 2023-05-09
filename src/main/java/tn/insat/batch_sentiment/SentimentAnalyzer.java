@@ -32,13 +32,8 @@ public class SentimentAnalyzer implements Serializable {
         // create a pipeline inside the function to avoid the error: java.io.NotSerializableException: edu.stanford.nlp.pipeline.StanfordCoreNLP
         StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
-        // extract body from the text
-        // take from the 2nd comma to the 2nd last comma
-        String[] parts = text.split(",");
-        String body = String.join(",", Arrays.copyOfRange(parts, 2, parts.length-2));
-        System.out.println("Body: "+body);
-        // create a document object
-        CoreDocument doc = new CoreDocument(body);
+
+        CoreDocument doc = new CoreDocument(text);
         // annotate
         pipeline.annotate(doc);
 
@@ -66,6 +61,6 @@ public class SentimentAnalyzer implements Serializable {
             }
         }
         System.out.println("Majority Sentiment: "+majoritySentiment);
-        return text + "," + majoritySentiment;
+        return majoritySentiment;
     }
 }
