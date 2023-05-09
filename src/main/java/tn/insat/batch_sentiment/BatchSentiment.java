@@ -31,6 +31,7 @@ public class BatchSentiment {
         JavaPairRDD<String, Integer> sentimentCounts = hBaseRDD.mapToPair(
                 tuple -> {
                     String text = new String(tuple._2.getValue("cf".getBytes(), "comment_body".getBytes()));
+                    System.out.println("Text: "+text);
                     String sentiment = analyzer.addSentiment(text);
                     return new Tuple2<String, Integer>(sentiment, 1);
                 }
