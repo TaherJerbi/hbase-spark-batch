@@ -17,7 +17,7 @@ public class BatchSentiment {
         SparkConf sparkConf = new SparkConf().setAppName("SparkHBaseTest").setMaster("local[4]");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
 
-        config.set(TableInputFormat.INPUT_TABLE,"comments_raw");
+        config.set(TableInputFormat.INPUT_TABLE,"comments_sentiments");
 
         JavaPairRDD<ImmutableBytesWritable, Result> hBaseRDD =
                 jsc.newAPIHadoopRDD(config, TableInputFormat.class, ImmutableBytesWritable.class, Result.class);
@@ -26,13 +26,10 @@ public class BatchSentiment {
         // IN: comment_id, comment_parent_id, comment_body, subreddit, timestamp
         // OUT: comment_id, comment_parent_id, comment_body, subreddit, timestamp, sentiment
 
-        SentimentAnalyzer analyzer = SentimentAnalyzer.getInstance();
-
         JavaPairRDD<String, Integer> sentimentCounts = hBaseRDD.mapToPair(
                 tuple -> {
-                    String text = new String(tuple._2.getValue("cf".getBytes(), "comment_body".getBytes()));
-                    System.out.println("Text: "+text);
-                    String sentiment = analyzer.getMajoritySentiment(text);
+                    String sentiment = new String(tuple._2.getValue("cf".getBytes(), "sentiment".getBytes()));
+                    System.out.println("Sentiment: " + sentiment);
                     return new Tuple2<String, Integer>(sentiment, 1);
                 }
         ).reduceByKey(
