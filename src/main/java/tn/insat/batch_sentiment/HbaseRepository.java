@@ -52,7 +52,7 @@ public class HbaseRepository {
 
             sentimentCounts.forEach(
                     tuple -> {
-                        put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes(tuple._1), Bytes.toBytes(tuple._2));
+                        put.addColumn(Bytes.toBytes("cf"), Bytes.toBytes(tuple._1), Bytes.toBytes(tuple._2.toString()));
                     }
             );
 

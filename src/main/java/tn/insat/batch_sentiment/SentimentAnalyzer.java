@@ -29,38 +29,44 @@ public class SentimentAnalyzer implements Serializable {
     // IN: comment_id, comment_parent_id, comment_body, subreddit, timestamp
     // OUT: comment_id, comment_parent_id, comment_body, subreddit, timestamp, sentiment
     public String getMajoritySentiment(String text){
-        // create a pipeline inside the function to avoid the error: java.io.NotSerializableException: edu.stanford.nlp.pipeline.StanfordCoreNLP
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        try {
+            // create a pipeline inside the function to avoid the error: java.io.NotSerializableException: edu.stanford.nlp.pipeline.StanfordCoreNLP
+            StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
 
-        CoreDocument doc = new CoreDocument(text);
-        // annotate
-        pipeline.annotate(doc);
+            CoreDocument doc = new CoreDocument(text);
+            // annotate
+            pipeline.annotate(doc);
 
-        HashMap<String, Integer> sentiments = new HashMap<String, Integer>();
-        // display sentences
-        for (CoreSentence sentence : doc.sentences()) {
-            String sentiment = sentence.sentiment();
-            System.out.println("    Sentence: "+sentence.toString());
-            System.out.println("    Sentiment: "+sentiment);
+            HashMap<String, Integer> sentiments = new HashMap<String, Integer>();
+            // display sentences
+            for (CoreSentence sentence : doc.sentences()) {
+                String sentiment = sentence.sentiment();
+                System.out.println("    Sentence: " + sentence.toString());
+                System.out.println("    Sentiment: " + sentiment);
 
-            if(sentiments.containsKey(sentiment)){
-                sentiments.put(sentiment, sentiments.get(sentiment)+1);
-            } else {
-                sentiments.put(sentiment, 1);
+                if (sentiments.containsKey(sentiment)) {
+                    sentiments.put(sentiment, sentiments.get(sentiment) + 1);
+                } else {
+                    sentiments.put(sentiment, 1);
+                }
             }
-        }
 
-        // get the majority sentiment from the sentiments map
-        String majoritySentiment = "";
-        int max = 0;
-        for(Map.Entry<String, Integer> entry : sentiments.entrySet()){
-            if(entry.getValue() > max){
-                max = entry.getValue();
-                majoritySentiment = entry.getKey();
+            // get the majority sentiment from the sentiments map
+            String majoritySentiment = "";
+            int max = 0;
+            for (Map.Entry<String, Integer> entry : sentiments.entrySet()) {
+                if (entry.getValue() > max) {
+                    max = entry.getValue();
+                    majoritySentiment = entry.getKey();
+                }
             }
+            System.out.println("Majority Sentiment: " + majoritySentiment);
+            return majoritySentiment;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Unknown";
         }
-        System.out.println("Majority Sentiment: "+majoritySentiment);
-        return majoritySentiment;
     }
+
 }
